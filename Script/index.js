@@ -3,8 +3,8 @@
 
 ////////////////////////////////////////////
 class Game {
-  constructor(difficulty = "easy", numCards = 12) {
-    this.difficulty = difficulty;
+  constructor(numCards = 12) {
+    // this.difficulty = difficulty;
     this.numCards = numCards;
     this.cards = new Array(numCards);
     this.state = Game.gameState.initial;
@@ -200,6 +200,9 @@ function onCardClicked(e) {
     }
   }
   setTimeout(() => {
+    document.querySelector(
+      ".matches"
+    ).innerHTML = `Matches: ${game.pairsMatched}`;
     document.querySelector(".moves").innerHTML = `Guesses: ${game.numAttempts}`;
   }, 1000);
 
@@ -228,22 +231,37 @@ let game = null;
 // let tMilS = document.querySelector(".millisec");
 let timer = 0; // timer id
 
+function newGame() {
+    let val = document.querySelector(".select").value;
+    let level = Game.level[val.toLowerCase()];
+    console.log("level selected ", level);
+
+    restartGame(level);
+}
+
 function restartGame(level) {
-  let rows=0,cols = 0;
+//   if (isNaN(level)) {
+//     // call is from a click on "new game"
+//     let e = document.querySelector(".select");
+//     setDifficulty(e);
+//     return;
+//   }
+  let rows = 0,
+    cols = 0;
   switch (level) {
-    case level.easy:
+    case Game.level.easy:
       rows = 3;
       cols = 4;
       break;
-    case level.medium:
+    case Game.level.medium:
       rows = 3;
       cols = 6;
       break;
-    case level.hard:
+    case Game.level.hard:
       rows = 4;
       cols = 6;
   }
-  game = new Game(level, rows * cols);
+  game = new Game(rows * cols);
   removeBoard();
   window.clearInterval(timer);
   loadGame(rows, cols);
@@ -251,31 +269,30 @@ function restartGame(level) {
 
 function loadGame(rows, cols) {
   // import {Game} from './memoryGame'
-  game = new Game();
-  console.log("Hi there");
+  game = new Game(rows * cols);
   loadBoard(rows, cols);
   let cards = document.querySelectorAll(".card");
   cards.forEach((card) => card.addEventListener("click", onCardClicked));
   let restart = document.querySelector(".restart");
-  restart.addEventListener("click", restartGame);
+  restart.addEventListener("click", newGame);
   let level = document.querySelector(".level");
-  level.addEventListener("change", setDifficulty(level.value));
+  level.addEventListener("change", setDifficulty);
   document.querySelector(".moves").innerHTML = "Guesses: 0";
   counter = 0;
   timer = window.setInterval(displayClock, 1000);
 }
 // TODO: implemnet later
 function setDifficulty(e) {
-  let level = e.value;
+  let level = e.currentTarget.value;
   switch (level) {
-    case "easy":
-      restartGame(level.easy);
+    case "Easy":
+      restartGame(Game.level.easy);
       break;
-    case "medium":
-      restartGame(level.medium);
+    case "Medium":
+      restartGame(Game.level.medium);
       break;
-    case "hard":
-      restartGame(level.hard);
+    case "Hard":
+      restartGame(Game.level.hard);
       break;
   }
 }

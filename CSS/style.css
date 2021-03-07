@@ -80,13 +80,14 @@ transform: rotateY(180deg);
     color: magenta;
     width: fit-content;
     height: 15px;
-    margin: 2px auto;
+    margin: 10px auto;
     padding: 5px;
     text-align: center;
     border: 3px solid skyblue;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center
 }
 
-.moves { text-align: center;}
+.data { text-align: center;}
