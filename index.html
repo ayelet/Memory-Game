@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./CSS/normalize.css">
+    <link rel="stylesheet" href="./CSS/style.css">
     <title>Memory Game</title>
 </head>
 <body>
     <main>
         <h1>Memory Card</h1>
-        <div class="card-board">
+        <div class="board">
 
         </div>
         <select class="btn select" name="difficulty" id="level">
@@ -19,10 +21,12 @@
         </select>
         <input type="button" value="Play" class="btn play">
         <input type="button" value="Restart" class="btn restart">
+        <p class="result"></p>
     </main>
     <footer>
 
     </footer>
 </body>
+<script src="./Script/memoryGame.js"></script>
 <script src="./Script/index.js"></script>
 </html>
