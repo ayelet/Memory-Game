@@ -8,31 +8,50 @@ class Game {
     this.cards = new Array(numCards);
     this.state = Game.gameState.initial;
     this.pairsMatched = 0;
+    this.isMatch = false;
     // fill the array
     for (let i = 0; i < numCards / 2; i += 1) {
       this.cards[i] = i;
       this.cards[i + numCards / 2] = i;
     }
     console.log(this.cards);
-    this.currentCard = -1;
-    this.previousCard = -1;
+    this.firstCard = -1;
+    this.secondCard = -1;
     console.log("game created", this.difficulty, this.numCards);
   }
-  level = { easy: "easy", medium: "medium", hard: "hard" };
-  pickCard(id) {
-    this.previousCard = this.currentCard;
-    this.currentCard = id;
-  }
-  isMatch() {
-      if (this.state !== Game.gameState.twoCards) return false;
+  static level = { easy: 0, medium: 1, hard: 2 };
 
-    if (this.currentCard === this.previousCard) {
-      console.log("match!");
+  pickCard(id) {
+    if (this.state === Game.gameState.initial) this.firstCard = id;
+    if (this.state === Game.gameState.oneCard) this.secondCard = id;
+
+    this.changeState();
+
+    console.log(
+      `pickCard(${id}: ${this.firstCard} ${this.secondCard}), ${this.state}`
+    );
+  }
+
+  releaseCards() {
+    this.firstCard = this.secondCard = -1;
+  }
+  // check for a match between 2 cards
+  checkMatch() {
+    if (this.firstCard === -1 || this.secondCard === -1) this.isMatch = false;
+    let a = this.cards[this.firstCard];
+    let b = this.cards[this.secondCard];
+    console.log("checkMatch: current, previous:", a, b);
+    // this.releaseCards();
+    // if (this.state !== Game.gameState.twoCards) return false;
+    if (a === b) {
       this.pairsMatched += 1;
-      return true;
+      console.log("match!, num pairs matched: ", this.pairsMatched);
+      this.isMatch = true;
+      return;
     }
     console.log("No match");
-    return false;
+    this.isMatch = false;
+    this.changeState();
   }
 
   shuffle(array) {
@@ -58,49 +77,38 @@ class Game {
   onChangeState(cardId) {
     switch (this.state) {
       case Game.gameState.initial:
-        this.state = Game.gameState.oneCard;
-        this.previousCard = this.currentCard = -1;
         break;
       case Game.gameState.oneCard:
-        this.currentCard = cardId;
         break;
       case Game.gameState.twoCards:
-          this.previousCard = this.currentCard;
-          this.currentCard = cardId;
-        break;
-      case Game.gameState.match:
-      case Game.gameState.noMatch:
-          this.currentCard = this.previousCard = -1;
+        this.checkMatch();
+
         break;
     }
   }
   ////////////////////////////
   changeState(cardId) {
+    console.log("**** changing state: from ", this.state);
     switch (this.state) {
       case Game.gameState.initial:
         this.state = Game.gameState.oneCard;
         break;
       case Game.gameState.oneCard:
         this.state = Game.gameState.twoCards;
+        console.log("9999 cards picked: ", this.firstCard, this.secondCard);
         break;
       case Game.gameState.twoCards:
-        if (this.isMatch) this.state = Game.gameState.match;
-        else this.state = Game.gameState.noMatch;
-        break;
-      case Game.gameState.match:
-      case Game.gameState.noMatch:
         this.state = Game.gameState.initial;
         break;
     }
     this.onChangeState(cardId);
+    console.log("### state changed to ", this.state);
   }
 
   static gameState = {
-    initial: "Initial",
+    initial: "noPick",
     oneCard: "OnePicked",
     twoCards: "TwoPicked",
-    match: "Match",
-    noMatch: "NoMatch",
   };
 }
 //////////////////end of Class Game
@@ -135,20 +143,19 @@ function loadBoard(level) {
 }
 /////////////////////////////////
 function flip(card) {
-//   game.changeState(card.id);
-  // Toggle states
   let list = card.classList;
-  console.log("b4 flip:", list);
+                        
+  // Toggle states
   if (list.contains("flipped")) {
-      list.remove("flipped");
-      list.add("shown");
-      card.innerHTML = game.cards[card.id];
-    } else {
-        list.add("flipped");
-        list.remove("shown");
-        card.innerHTML = "";
-    }
-    console.log("aftr flip: ", list);
+    list.remove("flipped");
+    list.add("shown");
+    card.innerHTML = game.cards[card.id];
+  } else {
+    list.add("flipped");
+    list.remove("shown");
+    card.innerHTML = "";
+  }
+  //   console.log("aftr flip: ", list);
 }
 /////////////////////////////////////
 function freeze(card) {
@@ -159,68 +166,37 @@ function unfreeze(card) {
   card.addEventListener("click", onCardClicked);
 }
 
-function freezeAll() {
-
-}
 function onCardClicked(e) {
-    let card = e.currentTarget;
-    // game.changeState();
-    console.log("before onClick:", game.state);
- if ((game.state === Game.gameState.initial) || 
- (game.state === Game.gameState.oneCard))
-  {
-    flip(card);
-    freeze(card);
-    game.changeState(e);
-   
-}
-if (game.state === Game.gameState.twoCards) {
-    game.changeState();
-    let match = game.isMatch();
-    if (match) {
-        // freezeBothCards()
-    } else {
-        //unflip both cards
-        // flip(card);
-    }
-}
-
-console.log("after on click", game.state);
-}
-function onCardClicked1(e) {
   let card = e.currentTarget;
-  // see what index was clicked
   flip(card);
   freeze(card);
-  //   if (game.isMatch()) {
-  //       game.changeState();
-  //       console.log("match");
-  //     } else {
-  //         unfreeze(card);
-  //         console.log("no match");
-  //         //   unfreeze(prevCard);
-  //     }
-    //   game.changeState();
-  console.log("clicked", card.id, game.state);
-  if (game.state === Game.gameState.noMatch) {
-    // flip back both cards
-    setTimeout(() => {
-      flip(card);
-      let previousCard = document.getElementById(`${game.previousCard}`);
-      flip(previousCard);
-      unfreeze(card);
-      unfreeze(previousCard);
-    }, 1500);
-    document.querySelector(".result").innerHTML = "No match";
-  } else if (game.state === Game.gameState.match) {
-    document.querySelector(".result").innerHTML = "Match";
-    // remove event listeners from both cards
-    freeze(card);
 
-    //    freeze(previousCard);
+  game.pickCard(card.id);
+
+  if (game.state === Game.gameState.initial) {
+  if (!game.isMatch) {
+    setTimeout(() => {
+      console.log("first id: ", this.firstCard);
+      console.log("2nd id: ", this.secondCard);
+      let firstCard = document.getElementById(`${game.firstCard}`);
+      let secondCard = document.getElementById(`${game.secondCard}`);
+      flip(firstCard);
+      flip(secondCard);
+      unfreeze(firstCard);
+      unfreeze(secondCard);
+    }, 1500);
   }
+  }
+  console.log("after on click, id: ", card.id, game.state);
 }
+
 let game = null;
+function restartGame() {
+  game = new Game();
+}
+
+// TODO: implemnet later
+function setDifficulty(level) {}
 function main() {
   // import {Game} from './memoryGame'
   game = new Game();
@@ -228,5 +204,10 @@ function main() {
   loadBoard("easy");
   let cards = document.querySelectorAll(".card");
   cards.forEach((card) => card.addEventListener("click", onCardClicked));
+  let restart = document.querySelector(".restart");
+  restart.addEventListener("click", restartGame);
+  let level = document.querySelector(".level");
+  level.addEventListener("click", setDifficulty(level.value));
 }
+
 window.onload = main();

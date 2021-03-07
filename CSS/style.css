@@ -32,6 +32,13 @@ transform: rotateY(180deg);
     box-shadow: 2px 2px 1px gray;
    
     transition: transform 1s;
+    margin: 5px;
+    text-align: center;
+    font-size: 92px;
+    padding: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;  
 }
 
 .card:hover {
