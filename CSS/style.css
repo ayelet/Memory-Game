@@ -5,18 +5,42 @@
 
 body {
     background-color: var(--bacgkround-color);
+    color: magenta;
 }
+
+.container {
+    display: flex;
+    
+}
+
+.control {
+display: flex;
+flex-direction: column;
+justify-content: center;
+font-size: 24px;
+}
+
 .btn {
-    width: 5rem;
-    height: 2rem;
-    border: 2px solid black;
+    color:  magenta;
+    margin: 10px;
+    width: 8rem;
+    height: 3rem;
+    border: 2px solid pink;
     border-radius: 20px;
     outline: none;
+    box-shadow: 2px 2px 5px 2px #aaaaee;
+}
+.btn:hover {
+    box-shadow: 2px 2px 10px 2px #aaaaee;
+}
+.btn:active {
+    box-shadow: none;
 }
 
 .board {
-display: grid;
+display: inline-grid;
 height: fit-content;
+width: fit-content;
 }
 
 .flipped {
@@ -48,3 +72,21 @@ transform: rotateY(180deg);
 .card:active, card:focus {
     box-shadow: none;
 }
+
+.timer {
+    flex-direction: row;
+    align-items: center;
+    font-size: 24px;
+    color: magenta;
+    width: fit-content;
+    height: 15px;
+    margin: 2px auto;
+    padding: 5px;
+    text-align: center;
+    border: 3px solid skyblue;
+    display: flex;
+    justify-content: center;
+    align-items: center
+}
+
+.moves { text-align: center;}

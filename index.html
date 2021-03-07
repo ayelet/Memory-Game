@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,20 +9,31 @@
     <link rel="stylesheet" href="./CSS/style.css">
     <title>Memory Game</title>
 </head>
+
 <body>
     <main>
-        <h1>Memory Card</h1>
-        <div class="board">
+        <h1>L.O.L Surprise Memory Card</h1>
+        <div class="container">
 
+            <div class="board">
+
+            </div>
+            <div class="control">
+                <input type="button" value="New Game" class="btn restart">
+                <select class="level btn select" name="difficulty" id="level">
+                    <option value="Easy" selected>Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+                <!-- <input type="button" value="Play" class="btn play"> -->
+                <p class="result"></p>
+                <div class="moves">Wrong guesses: 0</div>
+                <div class="timer">
+                    <span class="clock min">00</span>:
+                    <span class="clock sec">00</span>
+                </div>
+            </div>
         </div>
-        <select class="level btn select" name="difficulty" id="level">
-            <option value="Easy" selected>Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-        </select>
-        <input type="button" value="Play" class="btn play">
-        <input type="button" value="Restart" class="btn restart">
-        <p class="result"></p>
     </main>
     <footer>
 
@@ -29,4 +41,5 @@
 </body>
 <script src="./Script/memoryGame.js"></script>
 <script src="./Script/index.js"></script>
+
 </html>

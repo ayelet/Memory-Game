@@ -1,5 +1,6 @@
 "use strict";
 // import {Game} from ('./memoryGame');
+
 ////////////////////////////////////////////
 class Game {
   constructor(difficulty = "easy", numCards = 12) {
@@ -9,6 +10,7 @@ class Game {
     this.state = Game.gameState.initial;
     this.pairsMatched = 0;
     this.isMatch = false;
+    this.numAttempts = 0; // number of wrong moves
     // fill the array
     for (let i = 0; i < numCards / 2; i += 1) {
       this.cards[i] = i;
@@ -51,6 +53,7 @@ class Game {
     }
     console.log("No match");
     this.isMatch = false;
+    this.numAttempts++;
     this.changeState();
   }
 
@@ -113,20 +116,22 @@ class Game {
 }
 //////////////////end of Class Game
 
-function loadBoard(level) {
-  let col = 0,
-    rows = 0;
-  switch (level) {
-    case "easy":
-      col = 4;
-      rows = 3;
-      break;
-    case "medium":
-    case "hard":
-      col = 5;
-      rows = 5;
-      break;
-  }
+function loadBoard(rows, col) {
+  //   let col = 0,
+  //     rows = 0;
+  //   switch (level) {
+  //     case level.easy:
+  //       col = 4;
+  //       rows = 3;
+  //       break;
+  //     case level.medium:
+  //         col = 6;
+  //         rows = 3;
+  //     case level.hard:
+  //       col = 6;
+  //       rows = 4;
+  //       break;
+  //   }
   let board = document.querySelector(".board");
   board.style.gridTemplateColumns = `repeat(${col}, 1fr)`;
   board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
@@ -141,10 +146,16 @@ function loadBoard(level) {
     }
   }
 }
+
+function removeBoard() {
+  let cards = document.querySelectorAll(".card");
+  let board = document.querySelector(".board");
+  cards.forEach((child) => board.removeChild(child));
+}
 /////////////////////////////////
 function flip(card) {
   let list = card.classList;
-                        
+
   // Toggle states
   if (list.contains("flipped")) {
     list.remove("flipped");
@@ -165,7 +176,7 @@ function freeze(card) {
 function unfreeze(card) {
   card.addEventListener("click", onCardClicked);
 }
-
+//////////////////////
 function onCardClicked(e) {
   let card = e.currentTarget;
   flip(card);
@@ -174,40 +185,103 @@ function onCardClicked(e) {
   game.pickCard(card.id);
 
   if (game.state === Game.gameState.initial) {
-  if (!game.isMatch) {
-    setTimeout(() => {
-      console.log("first id: ", this.firstCard);
-      console.log("2nd id: ", this.secondCard);
-      let firstCard = document.getElementById(`${game.firstCard}`);
-      let secondCard = document.getElementById(`${game.secondCard}`);
-      flip(firstCard);
-      flip(secondCard);
-      unfreeze(firstCard);
-      unfreeze(secondCard);
-    }, 1500);
+    if (!game.isMatch) {
+      setTimeout(() => {
+        console.log("first id: ", this.firstCard);
+        console.log("2nd id: ", this.secondCard);
+        let firstCard = document.getElementById(`${game.firstCard}`);
+        let secondCard = document.getElementById(`${game.secondCard}`);
+        flip(firstCard);
+        flip(secondCard);
+        unfreeze(firstCard);
+        unfreeze(secondCard);
+      }, 1500);
+    } else {
+    }
   }
-  }
-  console.log("after on click, id: ", card.id, game.state);
+  setTimeout(() => {
+    document.querySelector(".moves").innerHTML = `Guesses: ${game.numAttempts}`;
+  }, 1000);
+
+  // document.querySelector('.moves').innerHTML = "howdie";
+  //   console.log("after on click, id: ", card.id, game.state);
 }
 
+////////////////////////////////////////////
+let tMin = document.querySelector(".min");
+SecurityPolicyViolationEvent;
+let tSec = document.querySelector(".sec");
+let counter = 0;
+function displayClock(timeStamp) {
+  counter++;
+
+  let sec = Math.floor(counter % 60);
+  let min = Math.floor(counter / 60);
+  tSec.innerHTML = sec > 9 ? sec : `0${sec}`;
+  tMin.innerHTML = min > 9 ? min : `0${min}`;
+}
+///////////////////////////////////////
 let game = null;
-function restartGame() {
-  game = new Game();
+// let startSW = document.querySelector('.start');
+// let stopSW = document.querySelector('.stop');
+
+// let tMilS = document.querySelector(".millisec");
+let timer = 0; // timer id
+
+function restartGame(level) {
+  let rows=0,cols = 0;
+  switch (level) {
+    case level.easy:
+      rows = 3;
+      cols = 4;
+      break;
+    case level.medium:
+      rows = 3;
+      cols = 6;
+      break;
+    case level.hard:
+      rows = 4;
+      cols = 6;
+  }
+  game = new Game(level, rows * cols);
+  removeBoard();
+  window.clearInterval(timer);
+  loadGame(rows, cols);
 }
 
-// TODO: implemnet later
-function setDifficulty(level) {}
-function main() {
+function loadGame(rows, cols) {
   // import {Game} from './memoryGame'
   game = new Game();
   console.log("Hi there");
-  loadBoard("easy");
+  loadBoard(rows, cols);
   let cards = document.querySelectorAll(".card");
   cards.forEach((card) => card.addEventListener("click", onCardClicked));
   let restart = document.querySelector(".restart");
   restart.addEventListener("click", restartGame);
   let level = document.querySelector(".level");
-  level.addEventListener("click", setDifficulty(level.value));
+  level.addEventListener("change", setDifficulty(level.value));
+  document.querySelector(".moves").innerHTML = "Guesses: 0";
+  counter = 0;
+  timer = window.setInterval(displayClock, 1000);
+}
+// TODO: implemnet later
+function setDifficulty(e) {
+  let level = e.value;
+  switch (level) {
+    case "easy":
+      restartGame(level.easy);
+      break;
+    case "medium":
+      restartGame(level.medium);
+      break;
+    case "hard":
+      restartGame(level.hard);
+      break;
+  }
+}
+
+function main() {
+  loadGame(3, 4);
 }
 
 window.onload = main();
