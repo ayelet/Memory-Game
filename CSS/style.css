@@ -6,6 +6,9 @@ body {
   background-color: var(--bacgkround-color);
   color: magenta;
 }
+main {
+     text-align: center;
+}
 
 .container {
   display: flex;
