@@ -9,12 +9,21 @@ body {
 main {
      text-align: center;
 }
+footer {
+  text-align: center;
+  font-size: 22px;
+}
 
 .container {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  width: fit-content;
+  border: 5px dashed white;
+  margin: auto;
+  padding: 5px;
+  border-radius: 20px;
 }
 
 .control {
