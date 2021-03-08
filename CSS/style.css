@@ -108,6 +108,7 @@ card:focus {
     top: 10%;    
     left: 10%;
     border: 20px solid pink;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
