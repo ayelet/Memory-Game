@@ -2,6 +2,21 @@
 // import {Game} from ('./memoryGame');
 
 ////////////////////////////////////////////
+const images = [
+  "../img/lol01.jpg",
+  "../img/lol02.jpg",
+  "../img/lol03.jpg",
+  "../img/lol04.jpg",
+  "../img/lol05.jpg",
+  "../img/lol06.jpg",
+  "../img/lol07.jpg",
+  "../img/lol08.jpg",
+  "../img/lol09.jpg",
+  "../img/lol10.jpg",
+  "../img/lol11.jpg",
+  "../img/lol12.jpg",
+];
+
 class Game {
   constructor(numCards = 12) {
     // this.difficulty = difficulty;
@@ -16,10 +31,9 @@ class Game {
       this.cards[i] = i;
       this.cards[i + numCards / 2] = i;
     }
-    console.log(this.cards);
+    this.shuffle(this.cards);
     this.firstCard = -1;
     this.secondCard = -1;
-    console.log("game created", this.difficulty, this.numCards);
   }
   static level = { easy: 0, medium: 1, hard: 2 };
 
@@ -28,10 +42,6 @@ class Game {
     if (this.state === Game.gameState.oneCard) this.secondCard = id;
 
     this.changeState();
-
-    console.log(
-      `pickCard(${id}: ${this.firstCard} ${this.secondCard}), ${this.state}`
-    );
   }
 
   releaseCards() {
@@ -42,18 +52,13 @@ class Game {
     if (this.firstCard === -1 || this.secondCard === -1) this.isMatch = false;
     let a = this.cards[this.firstCard];
     let b = this.cards[this.secondCard];
-    console.log("checkMatch: current, previous:", a, b);
-    // this.releaseCards();
-    // if (this.state !== Game.gameState.twoCards) return false;
     if (a === b) {
       this.pairsMatched += 1;
-      console.log("match!, num pairs matched: ", this.pairsMatched);
       this.isMatch = true;
-      return;
+    } else {
+      this.isMatch = false;
+      this.numAttempts++;
     }
-    console.log("No match");
-    this.isMatch = false;
-    this.numAttempts++;
     this.changeState();
   }
 
@@ -91,21 +96,18 @@ class Game {
   }
   ////////////////////////////
   changeState(cardId) {
-    console.log("**** changing state: from ", this.state);
     switch (this.state) {
       case Game.gameState.initial:
         this.state = Game.gameState.oneCard;
         break;
       case Game.gameState.oneCard:
         this.state = Game.gameState.twoCards;
-        console.log("9999 cards picked: ", this.firstCard, this.secondCard);
         break;
       case Game.gameState.twoCards:
         this.state = Game.gameState.initial;
         break;
     }
     this.onChangeState(cardId);
-    console.log("### state changed to ", this.state);
   }
 
   static gameState = {
@@ -117,21 +119,7 @@ class Game {
 //////////////////end of Class Game
 
 function loadBoard(rows, col) {
-  //   let col = 0,
-  //     rows = 0;
-  //   switch (level) {
-  //     case level.easy:
-  //       col = 4;
-  //       rows = 3;
-  //       break;
-  //     case level.medium:
-  //         col = 6;
-  //         rows = 3;
-  //     case level.hard:
-  //       col = 6;
-  //       rows = 4;
-  //       break;
-  //   }
+
   let board = document.querySelector(".board");
   board.style.gridTemplateColumns = `repeat(${col}, 1fr)`;
   board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
@@ -160,13 +148,15 @@ function flip(card) {
   if (list.contains("flipped")) {
     list.remove("flipped");
     list.add("shown");
-    card.innerHTML = game.cards[card.id];
+    let index = game.cards[card.id];
+    // card.innerHTML = index;
+    card.style.background = `url(${images[index]}) no-repeat center center/cover`;
   } else {
     list.add("flipped");
     list.remove("shown");
-    card.innerHTML = "";
+    // card.innerHTML = "";
+    card.style.background = `url("../img/background.jpg") no-repeat center center/cover`
   }
-  //   console.log("aftr flip: ", list);
 }
 /////////////////////////////////////
 function freeze(card) {
@@ -187,8 +177,6 @@ function onCardClicked(e) {
   if (game.state === Game.gameState.initial) {
     if (!game.isMatch) {
       setTimeout(() => {
-        console.log("first id: ", this.firstCard);
-        console.log("2nd id: ", this.secondCard);
         let firstCard = document.getElementById(`${game.firstCard}`);
         let secondCard = document.getElementById(`${game.secondCard}`);
         flip(firstCard);
@@ -206,13 +194,17 @@ function onCardClicked(e) {
     document.querySelector(".moves").innerHTML = `Guesses: ${game.numAttempts}`;
   }, 1000);
 
-  // document.querySelector('.moves').innerHTML = "howdie";
-  //   console.log("after on click, id: ", card.id, game.state);
+  let gameOver = game.pairsMatched === game.numCards / 2;
+  if (gameOver) {
+    let modal = document.querySelector(".end-game");
+    document.querySelector(".replay").addEventListener("click", newGame);
+    modal.style.display = "block";
+  }
+
 }
 
 ////////////////////////////////////////////
 let tMin = document.querySelector(".min");
-SecurityPolicyViolationEvent;
 let tSec = document.querySelector(".sec");
 let counter = 0;
 function displayClock(timeStamp) {
@@ -225,27 +217,18 @@ function displayClock(timeStamp) {
 }
 ///////////////////////////////////////
 let game = null;
-// let startSW = document.querySelector('.start');
-// let stopSW = document.querySelector('.stop');
-
-// let tMilS = document.querySelector(".millisec");
 let timer = 0; // timer id
 
 function newGame() {
-    let val = document.querySelector(".select").value;
-    let level = Game.level[val.toLowerCase()];
-    console.log("level selected ", level);
+  let val = document.querySelector(".select").value;
+  let level = Game.level[val.toLowerCase()];
 
-    restartGame(level);
+  document.querySelector(".end-game").style.display = "none";
+
+  restartGame(level);
 }
 
 function restartGame(level) {
-//   if (isNaN(level)) {
-//     // call is from a click on "new game"
-//     let e = document.querySelector(".select");
-//     setDifficulty(e);
-//     return;
-//   }
   let rows = 0,
     cols = 0;
   switch (level) {
@@ -268,7 +251,6 @@ function restartGame(level) {
 }
 
 function loadGame(rows, cols) {
-  // import {Game} from './memoryGame'
   game = new Game(rows * cols);
   loadBoard(rows, cols);
   let cards = document.querySelectorAll(".card");
@@ -281,7 +263,8 @@ function loadGame(rows, cols) {
   counter = 0;
   timer = window.setInterval(displayClock, 1000);
 }
-// TODO: implemnet later
+///////////////////////////////////
+// change number of cards according to game difficulty
 function setDifficulty(e) {
   let level = e.currentTarget.value;
   switch (level) {
